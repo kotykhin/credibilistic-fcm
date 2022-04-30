@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 import sys
 import os
@@ -9,7 +10,7 @@ from fuzzycmeans.visualization import draw_model_2d
 
 
 def example():
-    df = pd.read_csv('Iris.csv')
+    df = pd.read_csv('top10s_small.csv', sep=';')
     normal_data = normalize_input_data(df)
     headers = normal_data.columns
     test_data = normal_data.to_numpy()
@@ -20,19 +21,19 @@ def example():
     print(df)
     print("\n\nNormalized data")
     print(normal_data)
-    print("\n\nFCM membership matrix")
-    print(fcm.u)
     print("\nCluster centers after FCM")
     print(fcm.cluster_centers_)
+    draw_model_2d(fcm, test_data,'Fcm', headers)
     fcm.credibilistic_recalculation()
     fcm.compute_cluster_centers(test_data)
 
-    print("\n\nCredibilistic predicted membership")
-    print(fcm.u)
+    df["Cluster"] = [np.argmax(row) + 1 for row in fcm.u]
+    print("\n\Original data with result")
+    print(df)
     print("\nCluster centers after credibilistic")
     print(fcm.cluster_centers_)
 
-    draw_model_2d(fcm, test_data, headers)
+    draw_model_2d(fcm, test_data, 'Credibilistic', headers)
 
 
 example()
